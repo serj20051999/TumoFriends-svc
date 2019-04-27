@@ -10,6 +10,8 @@
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "morgan": "~1.9.0",
-    "nodemon": "^1.18.11"
+    "nodemon": "^1.18.11",
+    "passport": "^0.4.0",
+    "passport-http": "^0.3.0"
   }
 }
