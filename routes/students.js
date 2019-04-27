@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-
+var app = require('../app');
 var passport = require('passport');
 
 /* Get a single student: req.user.username */
