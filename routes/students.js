@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var app = require('../app');
 var passport = require('passport');
 
 /* Get a single student: req.user.username */
@@ -11,7 +10,17 @@ router.get('/students/:email', /*, passport.authenticate('basic', { session: fal
 
 /* Create a student account */
 router.post('/students', function(req, res, next) {
-  res.send({ todo: 'send information about the new student'});
+  const student = {
+    email: req.body.email,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    password: req.body.password,
+    learningTargets: req.body.learningTargets,
+    location: req.body.location
+  };
+  console.log(req.db);
+  // app.get('db').createCollection("students", student);
+  res.send(student);
 });
 
 /* Update a student account */
