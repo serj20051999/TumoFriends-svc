@@ -63,9 +63,26 @@ router.put('/students/:email', passport.authenticate('basic', { session: false }
 });
 
 /* Search for a student  */
-router.get('/students/', /*, passport.authenticate('basic', { session: false }) */
+router.get('/students/', passport.authenticate('basic', { session: false }),
   function(req, res, next) {
-    res.send({ todo: 'send information about the new student ' + req.query.email});
-});
+    const query = {}
+    if (req.query) {
+      Object.keys(req.query).forEach(q => {
+        if (q == "learningTargets") {
+          query[q] = { $all: JSON.parse(req.query[q]) }
+        } else {
+          query[q] = req.query[q]
+        }
+      });
+      console.log(query);
+    }
+    db.getClient().collection("students").find(query).toArray(function(err, results) {
+        if (err) {
+          res.status(500).send(err);        
+        } else {
+          res.send(results);
+        }
+      });
+  });
 
 module.exports = router;
