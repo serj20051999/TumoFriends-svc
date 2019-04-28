@@ -5,7 +5,7 @@ var passport = require('passport');
 var db = require('../db');
 
 /* Get a single student: req.user.username */
-router.get('/students/:email', /*, passport.authenticate('basic', { session: false }) */
+router.get('/students/:email', passport.authenticate('basic', { session: false }),
   function(req, res, next) {
     db.getClient().collection("students").findOne({email: req.params.email},
       function(err, results) {

@@ -32,12 +32,17 @@ db.connect();
  * TUMO CHANGES BELOW *
  * ********************
  */
-
-// TODO: Middleware for Authentication
 passport.use(new BasicStrategy(
   function(username, password, done) {
-    // TODO authenticate user
-    return done(null, {username: username})
+    db.getClient().collection("students").findOne({email: username},
+      function(err, user) {
+        if (err) { return done(err); }
+        if (!user) { return done(null, false); }
+        if (user.password != password) {
+          return done(null, false);
+        }
+        return done(null, user);
+      });
   }
 ));
 
