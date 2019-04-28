@@ -47,9 +47,19 @@ router.post('/students', function(req, res, next) {
 });
 
 /* Update a student account */
-router.put('/students/:email', /*, passport.authenticate('basic', { session: false }) */
+router.put('/students/:email', passport.authenticate('basic', { session: false }),
   function(req, res, next) {
-    res.send({ todo: 'update the student with the email ' + req.params.email});
+    db.getClient().collection("students").findOneAndUpdate({email: req.params.email}, {$set: req.body}, {returnOriginal: false},
+      function(err, results) {
+        if (err) {
+          res.status(500).send(err);
+        }
+        else if(results.value == null) {
+          res.status(400).send({error: "Student with email " + req.params.email  + " does not exist."})
+        } else {
+          res.send(results.value);
+        }
+      });
 });
 
 /* Search for a student  */
