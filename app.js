@@ -9,9 +9,13 @@ var studentsRouter = require('./routes/students');
 var passport = require('passport');
 var {BasicStrategy} = require('passport-http');
 
+var cors = require('cors')
+
 var db = require('./db');
 
 var app = express();
+
+app.use(cors());
 
 app.use(logger('dev'));
 app.use(express.json());
