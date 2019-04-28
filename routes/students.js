@@ -27,7 +27,7 @@ router.post('/students', function(req, res, next) {
       } else {
         db.getClient().collection("students").insertOne(student, function(err, r) {
           if (err) {
-            res.send(err);
+            res.status(500).send(err);
           }
           else {
             res.send(student);
