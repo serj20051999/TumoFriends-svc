@@ -11,7 +11,7 @@ router.get('/students/:email', /*, passport.authenticate('basic', { session: fal
 });
 
 /* Create a student account */
-router.post('/students', async function(req, res, next) {
+router.post('/students', function(req, res, next) {
   const student = {
     email: req.body.email,
     firstName: req.body.firstName,
@@ -20,7 +20,7 @@ router.post('/students', async function(req, res, next) {
     learningTargets: req.body.learningTargets,
     location: req.body.location
   };
-  const cursor = await db.getClient().collection("students").findOne({email: student.email},
+  db.getClient().collection("students").findOne({email: student.email},
     function(err, results) {
       if (results) {
         res.status(400).send({error: 'Student ' + student.email + ' already exists!'});
