@@ -41,7 +41,22 @@ function studentList(io) {
     });
 
     socket.on('disconnect', user => {
-      console.log('user disconnected - 2', socket.id);
+      db.getClient().collection("students").findOneAndUpdate(
+        {socketID:  socket.id},
+        {$set: {'loggedIn': false, 'socketID': null}},
+        {returnOriginal: false},
+        function(err, results) {
+          if (err) {
+            socket.emit('list error', err);
+          } else if(results.value == null) {
+            socket.emit('list error', {error: "Socket ID " + socket.id  + " does not exist."});
+          } else {
+            list.emit('logged out', results.value);
+          }
+        });
+    });
+
+    socket.on('logout', user => {
       db.getClient().collection("students").findOneAndUpdate(
         {socketID:  socket.id},
         {$set: {'loggedIn': false, 'socketID': null}},
@@ -59,9 +74,7 @@ function studentList(io) {
 
     socket.on('query', (params, fn) => {
       // For a given search params, return student list
-      console.log('params', params);
       db.getClient().collection("students").find(params).toArray(function(err, results) {
-        console.log(err, results);
         if (err) {
           socket.emit('list error', err);
         } else {
