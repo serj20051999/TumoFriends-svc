@@ -46,7 +46,6 @@ function studentList(io) {
 // TODO: Collaboration namespace for communicating between users
 function collaboration(io) {}
 
-
 module.exports = {
   connect,
 }
