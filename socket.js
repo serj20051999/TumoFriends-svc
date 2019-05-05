@@ -9,7 +9,7 @@ function connect(server) {
       socket.emit('reply', msg);
     });
     socket.on('disconnect', () => {
-      console.log('user disconnected');
+      console.log('user disconnected - 1');
     });
   });
 
@@ -23,20 +23,49 @@ function studentList(io) {
   const list = io.of('/list');
   list.on('connection', socket => {
     
-    socket.on('hello', user => {
-      // Update user db with student socket id
-
-      // Tell everyone this user logged in
-      list.emit('logged-in', user);
+    // When a user logs in 
+    socket.on('login', user => {
+      db.getClient().collection("students").findOneAndUpdate(
+        {email:  user.email},
+        {$set: {'loggedIn': true, 'socketID': socket.id}},
+        {returnOriginal: false},
+        function(err, results) {
+          if (err) {
+            socket.emit('list error', err);
+          } else if(results.value == null) {
+            socket.emit('list error', {error: "Student with email " + user.email  + " does not exist."});
+          } else {
+            list.emit('logged in', results.value);
+          }
+        });
     });
 
-    socket.on('query', (params) => {
+    socket.on('disconnect', user => {
+      console.log('user disconnected - 2', socket.id);
+      db.getClient().collection("students").findOneAndUpdate(
+        {socketID:  socket.id},
+        {$set: {'loggedIn': false, 'socketID': null}},
+        {returnOriginal: false},
+        function(err, results) {
+          if (err) {
+            socket.emit('list error', err);
+          } else if(results.value == null) {
+            socket.emit('list error', {error: "Socket ID " + socket.id  + " does not exist."});
+          } else {
+            list.emit('logged out', results.value);
+          }
+        });
+    });
+
+    socket.on('query', (params, fn) => {
       // For a given search params, return student list
-      db.getClient().collection("students").find(query).toArray(function(err, results) {
+      console.log('params', params);
+      db.getClient().collection("students").find(params).toArray(function(err, results) {
+        console.log(err, results);
         if (err) {
-          socket.emit('error', err);
+          socket.emit('list error', err);
         } else {
-          socket.emit('results', results);
+          fn(results);
         }
       });
     });
