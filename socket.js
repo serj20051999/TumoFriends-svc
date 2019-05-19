@@ -27,7 +27,7 @@ function studentList(io) {
     socket.on('login', user => {
       db.getClient().collection("students").findOneAndUpdate(
         {email:  user.email},
-        {$set: {'loggedIn': true, 'socketID': socket.id}},
+        {$set: {'loggedIn': true}},
         {returnOriginal: false},
         function(err, results) {
           if (err) {
@@ -42,8 +42,7 @@ function studentList(io) {
 
     socket.on('disconnect', user => {
       db.getClient().collection("students").findOneAndUpdate(
-        {socketID:  socket.id},
-        {$set: {'loggedIn': false, 'socketID': null}},
+        {$set: {'loggedIn': false}},
         {returnOriginal: false},
         function(err, results) {
           if (err) {
@@ -58,8 +57,7 @@ function studentList(io) {
 
     socket.on('logout', user => {
       db.getClient().collection("students").findOneAndUpdate(
-        {socketID:  socket.id},
-        {$set: {'loggedIn': false, 'socketID': null}},
+        {$set: {'loggedIn': false}},
         {returnOriginal: false},
         function(err, results) {
           if (err) {
@@ -74,10 +72,18 @@ function studentList(io) {
 
     socket.on('query', (params, fn) => {
       // For a given search params, return student list
-      db.getClient().collection("students").find(params).toArray(function(err, results) {
+      let criteria = {};
+      if (params.search) {
+        const textCriteria = { $text: { $search: params.search } };
+        const learningTargetCriteria = { learningTargets: params.search };
+        criteria = {$or: [textCriteria, learningTargetCriteria]};
+      };
+      db.getClient().collection("students").find(criteria).sort({loggedIn: -1}).toArray(function(err, results) {
         if (err) {
+          console.log('err', err);
           socket.emit('list error', err);
         } else {
+          console.log('results', results);
           fn(results);
         }
       });
