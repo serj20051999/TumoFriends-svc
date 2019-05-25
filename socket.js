@@ -3,28 +3,34 @@ var db = require('./db');
 
 function connect(server) {
   const io = socketIO(server);
-  io.on('connection', (socket) => {
-    socket.emit('welcome', 'you are connected');
-    socket.on('chat', (msg) => {
-      socket.emit('reply', msg);
-    });
-    socket.on('disconnect', () => {
-      console.log('user disconnected - 1');
-    });
-  });
-
+  
   // TODO: Create namespaces
   studentList(io);
-  collaboration(io);
 }
 
 // TODO: List namespace will provide list of logged in users
 function studentList(io) {
   const list = io.of('/list');
   list.on('connection', socket => {
-    
+
+    socket.on('start-chat', (toUser, fromUser) => {
+      list.in(toUser.email).emit('start-chat', fromUser);
+    });
+
+    socket.on('chat-message', (toUser, fromUser, message) => {
+      list.in(toUser.email).emit('chat-message', fromUser, message);
+    });
+
+    socket.on('editor-message', (toUser, fromUser, message) => {
+      list.in(toUser.email).emit('editor-message', fromUser, message);
+    });
+
+
     // When a user logs in 
     socket.on('login', user => {
+      // Join room of user's email
+      socket.join(user.email);
+
       db.getClient().collection("students").findOneAndUpdate(
         {email:  user.email},
         {$set: {'loggedIn': true}},
@@ -56,6 +62,8 @@ function studentList(io) {
     });
 
     socket.on('logout', user => {
+      socket.leave(user.email);
+
       db.getClient().collection("students").findOneAndUpdate(
         {$set: {'loggedIn': false}},
         {returnOriginal: false},
@@ -90,9 +98,6 @@ function studentList(io) {
     });
   });
 }
-
-// TODO: Collaboration namespace for communicating between users
-function collaboration(io) {}
 
 module.exports = {
   connect,
