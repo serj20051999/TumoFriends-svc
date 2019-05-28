@@ -14,17 +14,29 @@ function studentList(io) {
   list.on('connection', socket => {
 
     socket.on('start-chat', (toUser, fromUser) => {
-      list.in(toUser.email).emit('start-chat', fromUser);
+      if (toUser) {
+        list.in(toUser.email).emit('start-chat', fromUser);
+      }
     });
 
     socket.on('chat-message', (toUser, fromUser, message) => {
-      list.in(toUser.email).emit('chat-message', fromUser, message);
+      if (toUser) {
+        list.in(toUser.email).emit('chat-message', fromUser, message);
+      }
     });
 
     socket.on('editor-message', (toUser, fromUser, message) => {
-      list.in(toUser.email).emit('editor-message', fromUser, message);
+      if (toUser) {
+        list.in(toUser.email).emit('editor-message', fromUser, message);
+      }
     });
 
+
+    socket.on('drawing-message', (toUser, fromUser, message) => {
+      if (toUser) {
+        list.in(toUser.email).emit('drawing-message', fromUser, message);
+      }
+    });
 
     // When a user logs in 
     socket.on('login', user => {
@@ -80,6 +92,7 @@ function studentList(io) {
 
     socket.on('query', (params, fn) => {
       // For a given search params, return student list
+      console.log('query', params);
       let criteria = {};
       if (params.search) {
         const textCriteria = { $text: { $search: params.search } };
