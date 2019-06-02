@@ -30,8 +30,7 @@ function studentList(io) {
         list.in(toUser.email).emit('editor-message', fromUser, message);
       }
     });
-
-
+    
     socket.on('drawing-message', (toUser, fromUser, message) => {
       if (toUser) {
         list.in(toUser.email).emit('drawing-message', fromUser, message);
