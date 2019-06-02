@@ -5,11 +5,11 @@ function connect(server) {
   const io = socketIO(server);
   
   // TODO: Create namespaces
-  studentList(io);
+  usersNamespace(io);
 }
 
 // TODO: List namespace will provide list of logged in users
-function studentList(io) {
+function usersNamespace(io) {
   const users = io.of('/users');
   users.on('connection', socket => {
     // TODO: add listener for starting chat
