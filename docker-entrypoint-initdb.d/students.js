@@ -1,3 +1,4 @@
+db.students.remove({});
 db.students.insertMany([{
   "email": "mesrobk@gmail.com",
   "firstName": "Mesrob",
