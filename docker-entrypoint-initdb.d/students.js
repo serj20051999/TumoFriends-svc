@@ -3,7 +3,7 @@ db.students.insertMany([{
   "email": "serj.ohanyan@gmail.com",
   "firstName": "Serj",
   "lastName": "Ohanyan",
-  "password": "serj2005",
+  "password": "password",
   "learningTargets": [
     "Animation",
     "Web Development",
@@ -14,7 +14,7 @@ db.students.insertMany([{
   "email": "serj.ohanyan2@gmail.com",
   "firstName": "SerjON",
   "lastName": "OhanyanON",
-  "password": "serj20051999",
+  "password": "password",
   "learningTargets": [
     "Game Development",
   ],
