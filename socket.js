@@ -12,6 +12,12 @@ function connect(server) {
 function usersNamespace(io) {
   const users = io.of('/users');
   users.on('connection', socket => {
+    socket.on('start-chat', (withUser, fromUser) => {
+    
+      if (withUser) {
+        users.in(withUser.email).emit('start-chat', fromUser);
+      }
+    });
     // TODO: add listener for starting chat
 
     // TODO: add listener to chat message
@@ -60,14 +66,20 @@ function usersNamespace(io) {
     // TODO: add listener for logout message, update db, emit
 
     // TODO: add listener to search query
-    socket.on('search', (query, fn) => {
-      const obj = query ? {email: query} : {};
-      db.getClient().collection('students').find(obj).toArray(function(err, result){
-        console.log(err, result);
-        if(err){
-          socket.emit('list errors', err);
-        }else{
-          fn(result);
+    socket.on('search', (textSearch, fn) => {
+      let criteria = {};
+      if (textSearch) {
+        const textCriteria = { $text: { $search: params.search } };
+        const learningTargetCriteria = { learningTargets: params.search };
+        criteria = {$or: [textCriteria, learningTargetCriteria]};
+      }
+      db.getClient().collection("students").find(criteria).sort({loggedIn: -1}).toArray(function(err, results) {
+        if (err) {
+          console.log('err', err);
+          socket.emit('list error', err);
+        } else {
+          console.log('results', results);
+          fn(results);
         }
       });
     });
