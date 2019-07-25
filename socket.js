@@ -12,15 +12,20 @@ function connect(server) {
 function usersNamespace(io) {
   const users = io.of('/users');
   users.on('connection', socket => {
-    socket.on('start-chat', (withUser, fromUser) => {
+    socket.on('start-chat', (toUser, fromUser) => {
     
-      if (withUser) {
-        users.in(withUser.email).emit('start-chat', fromUser);
+      if (toUser) {
+        users.in(toUser.email).emit('start-chat', fromUser);
       }
     });
     // TODO: add listener for starting chat
 
     // TODO: add listener to chat message
+    socket.on('message', (msg, toUser) => {
+      if(toUser){
+        users.in(toUser.email).emit('new message', msg);
+      }
+    });
 
     // TODO: add listener for editor message WYSIWIG
 
