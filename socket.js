@@ -21,15 +21,25 @@ function usersNamespace(io) {
     // TODO: add listener for starting chat
 
     // TODO: add listener to chat message
-    socket.on('message', (msg, toUser) => {
+    socket.on('message', (message, toUser) => {
       if(toUser){
-        users.in(toUser.email).emit('new message', msg);
+        users.in(toUser.email).emit('new message', message);
       }
     });
 
-    // TODO: add listener for editor message WYSIWIG
+    socket.on('editor-message', (toUser, fromUser, message) => {
+      if (toUser) {
+        users.in(toUser.email).emit('editor-message', fromUser, message);
+      }
+    });
 
-    // TODO: add listener for drawing
+
+    socket.on('drawing-message', (toUser, fromUser, message) => {
+      if (toUser) {
+        users.in(toUser.email).emit('drawing-message', fromUser, message);
+      }
+    });
+
 
     // TODO: add listener for logging in, update flag loggedIn in Database, join room
     socket.on('login', user => {
